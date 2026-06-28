@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PartHub 07 — заявка на автозапчасти</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f4f1ea;
+      color: #1f2933;
+    }
+    header {
+      padding: 30px 18px 24px;
+      background: linear-gradient(135deg, #111827, #2f3b4a);
+      color: white;
+      text-align: center;
+    }
+    .logo { font-size: 28px; font-weight: 900; letter-spacing: 0.4px; }
+    .tagline { margin-top: 10px; font-size: 15px; color: #d6d3ca; line-height: 1.5; }
+    .container { max-width: 880px; margin: 0 auto; padding: 16px; }
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    }
+    h1, h2 { margin-top: 0; }
+    h1 { font-size: 27px; line-height: 1.22; margin-bottom: 12px; }
+    h2 { font-size: 22px; margin-bottom: 10px; }
+    p { line-height: 1.55; }
+    .badge {
+      display: inline-block;
+      background: #efe7d6;
+      color: #4a3b22;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .features { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .feature {
+      background: #f7f7f4;
+      padding: 13px;
+      border-radius: 15px;
+      border: 1px solid #e5e1d8;
+      font-weight: 700;
+    }
+    .quick-grid { display: grid; grid-template-columns: 1fr; gap: 9px; margin-top: 8px; }
+    .quick-option {
+      border: 1px solid #d3d0c8;
+      border-radius: 14px;
+      padding: 12px;
+      background: #fafafa;
+      cursor: pointer;
+      font-weight: 700;
+      text-align: center;
+      user-select: none;
+    }
+    .quick-option.active { background: #1f2933; color: white; border-color: #1f2933; }
+    label { display: block; margin-top: 13px; font-weight: 800; font-size: 14px; }
+    input, textarea {
+      width: 100%;
+      margin-top: 6px;
+      padding: 13px;
+      border-radius: 13px;
+      border: 1px solid #d3d0c8;
+      font-size: 16px;
+      background: #fff;
+      outline: none;
+    }
+    input:focus, textarea:focus { border-color: #1f2933; }
+    textarea { min-height: 90px; resize: vertical; }
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      background: #1f2933;
+      color: white;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    button:active { transform: scale(0.99); }
+    .note { font-size: 13px; color: #5f6b76; margin-top: 10px; line-height: 1.45; }
+    .success, .error {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+    .success { background: #e9f7ef; color: #1b6b3a; }
+    .error { background: #fdecec; color: #8a1f1f; }
+    .whatsapp-btn {
+      display: block;
+      text-align: center;
+      padding: 15px;
+      border-radius: 15px;
+      background: #25D366;
+      color: white;
+      font-size: 17px;
+      font-weight: 900;
+      text-decoration: none;
+      margin-top: 12px;
+    }
+    .copy-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 14px;
+      border-radius: 15px;
+      background: #efe7d6;
+      color: #2f2a20;
+      font-size: 16px;
+      font-weight: 900;
+      margin-top: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    footer { text-align: center; padding: 24px 16px; font-size: 13px; color: #6b7280; }
+    @media (min-width: 720px) {
+      .features { grid-template-columns: repeat(3, 1fr); }
+      .quick-grid { grid-template-columns: repeat(4, 1fr); }
+      h1 { font-size: 36px; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="logo">PartHub 07</div>
+  <div class="tagline">Одна заявка — несколько поставщиков — честная рекомендация по цене, сроку и качеству.</div>
+</header>
+
+<div class="container">
+  <section class="card">
+    <span class="badge">Подбор автозапчастей</span>
+    <h1>Запчасти по VIN, артикулу или описанию детали</h1>
+    <p>Заполните короткую заявку. Мы подберём варианты: оригинал, качественный аналог, бюджетное решение или самый быстрый срок поставки.</p>
+    <div class="features">
+      <div class="feature">Подбор по VIN</div>
+      <div class="feature">Для СТО, магазинов и частных клиентов</div>
+      <div class="feature">Совет по бренду и установке</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Оставить заявку</h2>
+    <form id="requestForm">
+      <label>Кто вы?</label>
+      <input type="hidden" name="clientType" id="clientType" required>
+      <div class="quick-grid" data-target="clientType">
+        <div class="quick-option">СТО</div>
+        <div class="quick-option">Магазин</div>
+        <div class="quick-option">Частное лицо</div>
+        <div class="quick-option">Автопарк</div>
+      </div>
+
+      <label>Имя</label>
+      <input name="name" placeholder="Например: Магомед" required />
+
+      <label>Телефон</label>
+      <input name="phone" placeholder="+7..." required />
+
+      <label>Город</label>
+      <input name="city" placeholder="Нальчик, Пятигорск, Черкесск..." />
+
+      <label>Марка авто</label>
+      <input name="carBrand" placeholder="Например: Haval, Chery, Toyota" required />
+
+      <label>Модель</label>
+      <input name="carModel" placeholder="Например: Jolion, Tiggo 7 Pro, Camry" required />
+
+      <label>Год выпуска</label>
+      <input name="year" placeholder="Например: 2022" required />
+
+      <label>Двигатель</label>
+      <input name="engine" placeholder="Например: 1.5 turbo, 2.0, дизель" />
+
+      <label>VIN</label>
+      <input name="vin" placeholder="VIN-код, если есть" />
+
+      <label>Какая деталь нужна?</label>
+      <textarea name="part" placeholder="Например: передние колодки, радиатор охлаждения, стойки стабилизатора..." required></textarea>
+
+      <label>Артикул, если есть</label>
+      <input name="article" placeholder="Можно оставить пустым" />
+
+      <label>Количество</label>
+      <input name="quantity" placeholder="Например: 1 шт, 1 комплект, 2 шт" />
+
+      <label>Что важнее?</label>
+      <input type="hidden" name="quality" id="quality" value="Оптимально цена/качество">
+      <div class="quick-grid" data-target="quality">
+        <div class="quick-option active">Оптимально цена/качество</div>
+        <div class="quick-option">Оригинал</div>
+        <div class="quick-option">Хороший аналог</div>
+        <div class="quick-option">Бюджет</div>
+      </div>
+
+      <label>Срочность</label>
+      <input type="hidden" name="urgency" id="urgency" value="Сегодня">
+      <div class="quick-grid" data-target="urgency">
+        <div class="quick-option active">Сегодня</div>
+        <div class="quick-option">1–2 дня</div>
+        <div class="quick-option">Не срочно</div>
+        <div class="quick-option">Главное дешевле</div>
+      </div>
+
+      <label>Комментарий</label>
+      <textarea name="comment" placeholder="Например: нужны два варианта — хороший аналог и бюджетный"></textarea>
+
+      <button type="submit">Сформировать заявку</button>
+
+      <div class="success" id="successMsg">
+        Заявка сформирована ✅<br>
+        Нажмите кнопку WhatsApp — менеджеру уйдёт готовый текст заявки.
+      </div>
+
+      <div id="whatsappBlock" style="display:none;">
+        <a id="whatsappLink" href="#" target="_blank" class="whatsapp-btn">Отправить заявку в WhatsApp</a>
+        <button type="button" id="copyBtn" class="copy-btn">Скопировать текст заявки</button>
+      </div>
+
+      <div class="error" id="errorMsg"></div>
+
+      <div class="note">
+        Первая версия работает без сложных настроек: заявка формируется и отправляется в WhatsApp на номер +7 928 700-10-57.
+        Фото детали, VIN или СТС можно прикрепить уже в WhatsApp.
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Что будет после заявки?</h2>
+    <p>Менеджер проверит варианты по поставщикам, сравнит цену и срок, после чего предложит подходящий вариант: оригинал, хороший аналог или бюджетное решение.</p>
+  </section>
+
+  <section class="card">
+    <h2>Экспертная рекомендация</h2>
+    <p>По возможности мы подскажем краткую информацию о бренде, уровень качества, практический совет механика и что желательно проверить перед установкой.</p>
+  </section>
+</div>
+
+<footer>PartHub 07 — подбор автозапчастей по VIN, артикулу и описанию.</footer>
+
+<script>
+  const WHATSAPP_PHONE = "79287001057";
+
+  const form = document.getElementById("requestForm");
+  const successMsg = document.getElementById("successMsg");
+  const errorMsg = document.getElementById("errorMsg");
+  const whatsappBlock = document.getElementById("whatsappBlock");
+  const whatsappLink = document.getElementById("whatsappLink");
+  const copyBtn = document.getElementById("copyBtn");
+
+  let lastRequestText = "";
+
+  document.querySelectorAll(".quick-grid").forEach(function(grid) {
+    const targetId = grid.getAttribute("data-target");
+    const targetInput = document.getElementById(targetId);
+    grid.querySelectorAll(".quick-option").forEach(function(option) {
+      option.addEventListener("click", function() {
+        grid.querySelectorAll(".quick-option").forEach(function(item) {
+          item.classList.remove("active");
+        });
+        option.classList.add("active");
+        targetInput.value = option.textContent.trim();
+      });
+    });
+  });
+
+  function buildPlainText(data) {
+    return (
+      "Здравствуйте. Оставил заявку на подбор автозапчасти.\n\n" +
+      "Тип клиента: " + (data.clientType || "-") + "\n" +
+      "Имя: " + (data.name || "-") + "\n" +
+      "Телефон: " + (data.phone || "-") + "\n" +
+      "Город: " + (data.city || "-") + "\n\n" +
+      "Авто: " + (data.carBrand || "-") + " " + (data.carModel || "-") + "\n" +
+      "Год: " + (data.year || "-") + "\n" +
+      "Двигатель: " + (data.engine || "-") + "\n" +
+      "VIN: " + (data.vin || "-") + "\n\n" +
+      "Деталь: " + (data.part || "-") + "\n" +
+      "Артикул: " + (data.article || "-") + "\n" +
+      "Количество: " + (data.quantity || "-") + "\n" +
+      "Что важнее: " + (data.quality || "-") + "\n" +
+      "Срочность: " + (data.urgency || "-") + "\n\n" +
+      "Комментарий: " + (data.comment || "-") + "\n\n" +
+      "Сейчас отправлю фото детали / VIN / СТС."
+    );
+  }
+
+  form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    successMsg.style.display = "none";
+    errorMsg.style.display = "none";
+    whatsappBlock.style.display = "none";
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    if (!data.clientType) {
+      errorMsg.textContent = "Выберите, кто вы: СТО, магазин, частное лицо или автопарк.";
+      errorMsg.style.display = "block";
+      return;
+    }
+
+    lastRequestText = buildPlainText(data);
+    whatsappLink.href = "https://wa.me/" + WHATSAPP_PHONE + "?text=" + encodeURIComponent(lastRequestText);
+
+    successMsg.style.display = "block";
+    whatsappBlock.style.display = "block";
+    whatsappBlock.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  copyBtn.addEventListener("click", async function() {
+    try {
+      await navigator.clipboard.writeText(lastRequestText);
+      copyBtn.textContent = "Текст скопирован ✅";
+      setTimeout(function() {
+        copyBtn.textContent = "Скопировать текст заявки";
+      }, 2000);
+    } catch (error) {
+      alert("Не получилось скопировать. Нажмите WhatsApp-кнопку.");
+    }
+  });
+</script>
+</body>
+</html>
