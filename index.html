@@ -3,24 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>PartHub 07 — заявка на автозапчасти</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       background: #f4f1ea;
       color: #1f2933;
     }
+
     header {
       padding: 30px 18px 24px;
       background: linear-gradient(135deg, #111827, #2f3b4a);
       color: white;
       text-align: center;
     }
+
     .logo { font-size: 28px; font-weight: 900; letter-spacing: 0.4px; }
     .tagline { margin-top: 10px; font-size: 15px; color: #d6d3ca; line-height: 1.5; }
-    .container { max-width: 880px; margin: 0 auto; padding: 16px; }
+
+    .container { max-width: 760px; margin: 0 auto; padding: 16px; }
+
     .card {
       background: white;
       border-radius: 22px;
@@ -28,10 +35,12 @@
       margin-bottom: 16px;
       box-shadow: 0 10px 28px rgba(0,0,0,0.08);
     }
+
     h1, h2 { margin-top: 0; }
     h1 { font-size: 27px; line-height: 1.22; margin-bottom: 12px; }
     h2 { font-size: 22px; margin-bottom: 10px; }
     p { line-height: 1.55; }
+
     .badge {
       display: inline-block;
       background: #efe7d6;
@@ -42,7 +51,14 @@
       font-weight: 800;
       margin-bottom: 12px;
     }
-    .features { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
     .feature {
       background: #f7f7f4;
       padding: 13px;
@@ -50,7 +66,25 @@
       border: 1px solid #e5e1d8;
       font-weight: 700;
     }
-    .quick-grid { display: grid; grid-template-columns: 1fr; gap: 9px; margin-top: 8px; }
+
+    .info-box {
+      background: #f7f7f4;
+      border: 1px solid #e5e1d8;
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0 16px;
+      color: #3f4a56;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 9px;
+      margin-top: 8px;
+    }
+
     .quick-option {
       border: 1px solid #d3d0c8;
       border-radius: 14px;
@@ -61,9 +95,18 @@
       text-align: center;
       user-select: none;
     }
-    .quick-option.active { background: #1f2933; color: white; border-color: #1f2933; }
+
+    .quick-option.active {
+      background: #1f2933;
+      color: white;
+      border-color: #1f2933;
+    }
+
     label { display: block; margin-top: 13px; font-weight: 800; font-size: 14px; }
-    input, textarea {
+    .required { color: #dc2626; font-weight: 900; }
+    .optional { color: #6b7280; font-weight: 700; font-size: 12px; }
+
+    input, textarea, select {
       width: 100%;
       margin-top: 6px;
       padding: 13px;
@@ -73,8 +116,10 @@
       background: #fff;
       outline: none;
     }
-    input:focus, textarea:focus { border-color: #1f2933; }
-    textarea { min-height: 90px; resize: vertical; }
+
+    input:focus, textarea:focus, select:focus { border-color: #1f2933; }
+    textarea { min-height: 96px; resize: vertical; }
+
     button {
       width: 100%;
       margin-top: 18px;
@@ -87,8 +132,18 @@
       font-weight: 900;
       cursor: pointer;
     }
+
     button:active { transform: scale(0.99); }
-    .note { font-size: 13px; color: #5f6b76; margin-top: 10px; line-height: 1.45; }
+
+    .note, .field-hint, .search-count {
+      font-size: 13px;
+      color: #5f6b76;
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+
+    .field-hint { font-size: 12px; color: #6b7280; margin-top: 5px; }
+
     .success, .error {
       display: none;
       margin-top: 14px;
@@ -97,8 +152,10 @@
       font-weight: 800;
       line-height: 1.45;
     }
+
     .success { background: #e9f7ef; color: #1b6b3a; }
     .error { background: #fdecec; color: #8a1f1f; }
+
     .whatsapp-btn {
       display: block;
       text-align: center;
@@ -111,6 +168,7 @@
       text-decoration: none;
       margin-top: 12px;
     }
+
     .copy-btn {
       display: block;
       width: 100%;
@@ -125,98 +183,149 @@
       border: none;
       cursor: pointer;
     }
+
+    .search-wrap { position: relative; }
+
+    .suggestions {
+      display: none;
+      position: relative;
+      margin-top: 8px;
+      border: 1px solid #e5e1d8;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    }
+
+    .suggestion-item {
+      padding: 12px;
+      border-bottom: 1px solid #eee9df;
+      cursor: pointer;
+    }
+
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover { background: #f7f7f4; }
+
+    .suggest-title {
+      font-weight: 900;
+      font-size: 14px;
+      color: #1f2933;
+      line-height: 1.35;
+    }
+
+    .suggest-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.35;
+    }
+
+    .suggest-cat {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #efe7d6;
+      color: #4a3b22;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
     footer { text-align: center; padding: 24px 16px; font-size: 13px; color: #6b7280; }
+
     @media (min-width: 720px) {
       .features { grid-template-columns: repeat(3, 1fr); }
-      .quick-grid { grid-template-columns: repeat(4, 1fr); }
-      h1 { font-size: 36px; }
+      .quick-grid { grid-template-columns: repeat(3, 1fr); }
+      h1 { font-size: 34px; }
     }
   </style>
 </head>
 
 <body>
+
 <header>
   <div class="logo">PartHub 07</div>
-  <div class="tagline">Одна заявка — несколько поставщиков — честная рекомендация по цене, сроку и качеству.</div>
+  <div class="tagline">Быстрый подбор автозапчастей по VIN, авто или описанию детали.</div>
 </header>
 
 <div class="container">
+
   <section class="card">
-    <span class="badge">Подбор автозапчастей</span>
-    <h1>Запчасти по VIN, артикулу или описанию детали</h1>
-    <p>Заполните короткую заявку. Мы подберём варианты: оригинал, качественный аналог, бюджетное решение или самый быстрый срок поставки.</p>
+    <span class="badge">Заявка за 1 минуту</span>
+    <h1>Подберём запчасть по VIN, авто или описанию</h1>
+    <p>
+      Оставьте имя и телефон — этого достаточно, чтобы мы связались с вами.
+      Чем подробнее заполните остальные поля, тем точнее и быстрее будет подбор.
+    </p>
+
     <div class="features">
-      <div class="feature">Подбор по VIN</div>
-      <div class="feature">Для СТО, магазинов и частных клиентов</div>
+      <div class="feature">Минимум обязательных полей</div>
+      <div class="feature">Прайс разделён по категориям</div>
       <div class="feature">Совет по бренду и установке</div>
     </div>
   </section>
 
   <section class="card">
     <h2>Оставить заявку</h2>
-    <form id="requestForm">
-      <label>Кто вы?</label>
-      <input type="hidden" name="clientType" id="clientType" required>
-      <div class="quick-grid" data-target="clientType">
-        <div class="quick-option">СТО</div>
-        <div class="quick-option">Магазин</div>
-        <div class="quick-option">Частное лицо</div>
-        <div class="quick-option">Автопарк</div>
-      </div>
 
-      <label>Имя</label>
+    <div class="info-box">
+      Чтобы получить более точную консультацию по запчастям, постарайтесь указать VIN,
+      авто, нужную деталь и пожелание по качеству. Все поля ниже, кроме имени и телефона,
+      добровольные — но подробная заявка экономит время и помогает подобрать правильную деталь.
+    </div>
+
+    <form id="requestForm">
+      <label>Имя <span class="required">*</span></label>
       <input name="name" placeholder="Например: Магомед" required />
 
-      <label>Телефон</label>
+      <label>Телефон <span class="required">*</span></label>
       <input name="phone" placeholder="+7..." required />
 
-      <label>Город</label>
-      <input name="city" placeholder="Нальчик, Пятигорск, Черкесск..." />
+      <label>VIN-код <span class="optional">необязательно</span></label>
+      <input name="vin" placeholder="Если есть — укажите VIN" />
+      <div class="field-hint">VIN помогает избежать ошибки по детали. Можно оставить пустым и отправить позже в WhatsApp.</div>
 
-      <label>Марка авто</label>
-      <input name="carBrand" placeholder="Например: Haval, Chery, Toyota" required />
+      <label>Раздел запчастей <span class="optional">необязательно</span></label>
+      <select id="categorySelect"></select>
+      <div class="field-hint">Выберите раздел, чтобы сузить поиск и быстрее найти нужную позицию.</div>
 
-      <label>Модель</label>
-      <input name="carModel" placeholder="Например: Jolion, Tiggo 7 Pro, Camry" required />
+      <label>Поиск по прайсу <span class="optional">необязательно</span></label>
+      <div class="search-wrap">
+        <input id="priceSearch" placeholder="Введите бренд, артикул, название детали или модель авто" autocomplete="off" />
+        <div id="suggestions" class="suggestions"></div>
+      </div>
+      <div class="search-count" id="searchCount">В поиск добавлены только раздел, бренд, артикул и описание детали. Остатки и наличие не показываются.</div>
 
-      <label>Год выпуска</label>
-      <input name="year" placeholder="Например: 2022" required />
+      <label>Авто <span class="optional">необязательно</span></label>
+      <input name="car" id="carField" placeholder="Например: Haval Jolion 2022, 1.5 turbo" />
 
-      <label>Двигатель</label>
-      <input name="engine" placeholder="Например: 1.5 turbo, 2.0, дизель" />
+      <label>Какая деталь нужна? <span class="optional">необязательно</span></label>
+      <textarea name="part" id="partField" placeholder="Например: передние колодки, радиатор охлаждения, стойки стабилизатора..."></textarea>
 
-      <label>VIN</label>
-      <input name="vin" placeholder="VIN-код, если есть" />
+      <label>Артикул детали <span class="optional">необязательно</span></label>
+      <input name="article" id="articleField" placeholder="Если есть артикул — укажите его" />
 
-      <label>Какая деталь нужна?</label>
-      <textarea name="part" placeholder="Например: передние колодки, радиатор охлаждения, стойки стабилизатора..." required></textarea>
+      <label>Бренд детали <span class="optional">необязательно</span></label>
+      <input name="brand" id="brandField" placeholder="Например: FORD, MASUMA, PARTBERRY" />
 
-      <label>Артикул, если есть</label>
-      <input name="article" placeholder="Можно оставить пустым" />
-
-      <label>Количество</label>
-      <input name="quantity" placeholder="Например: 1 шт, 1 комплект, 2 шт" />
-
-      <label>Что важнее?</label>
+      <label>Что важнее? <span class="optional">необязательно</span></label>
       <input type="hidden" name="quality" id="quality" value="Оптимально цена/качество">
       <div class="quick-grid" data-target="quality">
-        <div class="quick-option active">Оптимально цена/качество</div>
+        <div class="quick-option active">Оптимально</div>
         <div class="quick-option">Оригинал</div>
-        <div class="quick-option">Хороший аналог</div>
         <div class="quick-option">Бюджет</div>
       </div>
 
-      <label>Срочность</label>
-      <input type="hidden" name="urgency" id="urgency" value="Сегодня">
+      <label>Срочность <span class="optional">необязательно</span></label>
+      <input type="hidden" name="urgency" id="urgency" value="Можно уточнить">
       <div class="quick-grid" data-target="urgency">
-        <div class="quick-option active">Сегодня</div>
+        <div class="quick-option active">Можно уточнить</div>
+        <div class="quick-option">Сегодня / срочно</div>
         <div class="quick-option">1–2 дня</div>
-        <div class="quick-option">Не срочно</div>
-        <div class="quick-option">Главное дешевле</div>
       </div>
 
-      <label>Комментарий</label>
-      <textarea name="comment" placeholder="Например: нужны два варианта — хороший аналог и бюджетный"></textarea>
+      <label>Комментарий <span class="optional">необязательно</span></label>
+      <textarea name="comment" placeholder="Например: нужны 2 варианта — хороший аналог и бюджетный. Фото отправлю в WhatsApp."></textarea>
 
       <button type="submit">Сформировать заявку</button>
 
@@ -232,26 +341,32 @@
 
       <div class="error" id="errorMsg"></div>
 
-      <div class="note">
-        Первая версия работает без сложных настроек: заявка формируется и отправляется в WhatsApp на номер +7 928 700-10-57.
-        Фото детали, VIN или СТС можно прикрепить уже в WhatsApp.
-      </div>
+      <div class="note">Обязательные поля отмечены красной звёздочкой. Фото детали, VIN или СТС можно прикрепить уже в WhatsApp.</div>
     </form>
   </section>
 
   <section class="card">
-    <h2>Что будет после заявки?</h2>
-    <p>Менеджер проверит варианты по поставщикам, сравнит цену и срок, после чего предложит подходящий вариант: оригинал, хороший аналог или бюджетное решение.</p>
+    <h2>Как работает поиск</h2>
+    <p>
+      Сначала выберите раздел: фильтры, тормоза, подвеска, охлаждение и так далее.
+      Потом начните вводить название детали, бренд, артикул или модель из описания.
+      Выберите подходящую строку — название детали, артикул и бренд автоматически попадут в заявку.
+    </p>
   </section>
 
   <section class="card">
     <h2>Экспертная рекомендация</h2>
-    <p>По возможности мы подскажем краткую информацию о бренде, уровень качества, практический совет механика и что желательно проверить перед установкой.</p>
+    <p>
+      По возможности подскажем краткую информацию о бренде, уровень качества,
+      совет механика и что желательно проверить перед установкой.
+    </p>
   </section>
+
 </div>
 
-<footer>PartHub 07 — подбор автозапчастей по VIN, артикулу и описанию.</footer>
+<footer>PartHub 07 — подбор автозапчастей по VIN, авто и описанию детали.</footer>
 
+<script src="catalog.js"></script>
 <script>
   const WHATSAPP_PHONE = "79287001057";
 
@@ -262,40 +377,220 @@
   const whatsappLink = document.getElementById("whatsappLink");
   const copyBtn = document.getElementById("copyBtn");
 
+  const categorySelect = document.getElementById("categorySelect");
+  const priceSearch = document.getElementById("priceSearch");
+  const suggestions = document.getElementById("suggestions");
+  const searchCount = document.getElementById("searchCount");
+  const carField = document.getElementById("carField");
+  const partField = document.getElementById("partField");
+  const articleField = document.getElementById("articleField");
+  const brandField = document.getElementById("brandField");
+
   let lastRequestText = "";
+  let catalogReady = false;
+
+  function initCategories() {
+    PRICE_CATEGORIES.forEach(function(cat) {
+      const opt = document.createElement("option");
+      opt.value = cat;
+      if (cat === "Все разделы") {
+        opt.textContent = "Все разделы";
+      } else {
+        opt.textContent = cat + " (" + (PRICE_CATEGORY_COUNTS[cat] || 0) + ")";
+      }
+      categorySelect.appendChild(opt);
+    });
+  }
+
+  initCategories();
 
   document.querySelectorAll(".quick-grid").forEach(function(grid) {
     const targetId = grid.getAttribute("data-target");
     const targetInput = document.getElementById(targetId);
+
     grid.querySelectorAll(".quick-option").forEach(function(option) {
       option.addEventListener("click", function() {
         grid.querySelectorAll(".quick-option").forEach(function(item) {
           item.classList.remove("active");
         });
+
         option.classList.add("active");
         targetInput.value = option.textContent.trim();
       });
     });
   });
 
+  function prepareCatalog() {
+    if (catalogReady) return;
+    PRICE_CATALOG.forEach(function(item) {
+      item.push((item[0] + " " + item[1] + " " + item[2] + " " + item[3]).toLowerCase());
+    });
+    catalogReady = true;
+  }
+
+  function normalizeQuery(value) {
+    return (value || "").trim().toLowerCase();
+  }
+
+  function renderSuggestions(results, query) {
+    suggestions.innerHTML = "";
+
+    if (!query || query.length < 2) {
+      suggestions.style.display = "none";
+      searchCount.textContent = "Введите минимум 2 символа. Для точности сначала выберите раздел.";
+      return;
+    }
+
+    if (!results.length) {
+      suggestions.style.display = "none";
+      searchCount.textContent = "Совпадений не найдено. Можно заполнить заявку вручную.";
+      return;
+    }
+
+    results.forEach(function(item) {
+      const div = document.createElement("div");
+      div.className = "suggestion-item";
+
+      const title = document.createElement("div");
+      title.className = "suggest-title";
+      title.textContent = item[3] || "Без описания";
+
+      const meta = document.createElement("div");
+      meta.className = "suggest-meta";
+      meta.textContent = "Бренд: " + (item[1] || "-") + " · Артикул: " + (item[2] || "-");
+
+      const cat = document.createElement("div");
+      cat.className = "suggest-cat";
+      cat.textContent = item[0] || "Прочее";
+
+      div.appendChild(title);
+      div.appendChild(meta);
+      div.appendChild(cat);
+
+      div.addEventListener("click", function() {
+        partField.value = item[3] || "";
+        articleField.value = item[2] || "";
+        brandField.value = item[1] || "";
+
+        if (!carField.value.trim()) {
+          const guessedCar = guessCarFromDescription(item[3] || "");
+          if (guessedCar) carField.value = guessedCar;
+        }
+
+        priceSearch.value = (item[2] ? item[2] + " — " : "") + (item[3] || "");
+        suggestions.style.display = "none";
+        searchCount.textContent = "Позиция добавлена в заявку. При необходимости уточните VIN или авто.";
+      });
+
+      suggestions.appendChild(div);
+    });
+
+    suggestions.style.display = "block";
+    searchCount.textContent = "Показаны первые " + results.length + " совпадений. Уточните раздел или запрос, если нужно точнее.";
+  }
+
+  function guessCarFromDescription(description) {
+    const text = " " + description.toUpperCase() + " ";
+    const brands = [
+      "HAVAL", "CHERY", "GEELY", "CHANGAN", "EXEED", "OMODA", "JAECOO", "TANK",
+      "TOYOTA", "LEXUS", "HYUNDAI", "KIA", "FORD", "NISSAN", "RENAULT",
+      "MERCEDES", "BMW", "AUDI", "VOLKSWAGEN", "VOLVO", "MITSUBISHI",
+      "MAZDA", "HONDA", "CHEVROLET", "LADA", "GAZ", "UAZ", "JEEP", "DODGE"
+    ];
+
+    for (let i = 0; i < brands.length; i++) {
+      const b = brands[i];
+      if (text.includes(" " + b + " ")) {
+        const idx = text.indexOf(" " + b + " ");
+        return description.substring(Math.max(0, idx - 1), Math.min(description.length, idx + 70)).trim();
+      }
+    }
+
+    return "";
+  }
+
+  function performSearch() {
+    prepareCatalog();
+
+    const query = normalizeQuery(priceSearch.value);
+    const selectedCategory = categorySelect.value;
+
+    if (query.length < 2) {
+      renderSuggestions([], query);
+      return;
+    }
+
+    const qParts = query.split(/\s+/).filter(Boolean);
+    const results = [];
+
+    for (let i = 0; i < PRICE_CATALOG.length; i++) {
+      const item = PRICE_CATALOG[i];
+
+      if (selectedCategory && selectedCategory !== "Все разделы" && item[0] !== selectedCategory) {
+        continue;
+      }
+
+      const searchText = item[4];
+      let ok = true;
+
+      for (let j = 0; j < qParts.length; j++) {
+        if (!searchText.includes(qParts[j])) {
+          ok = false;
+          break;
+        }
+      }
+
+      if (ok) {
+        results.push(item);
+        if (results.length >= 12) break;
+      }
+    }
+
+    renderSuggestions(results, query);
+  }
+
+  let searchTimer = null;
+
+  priceSearch.addEventListener("input", function() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(performSearch, 160);
+  });
+
+  categorySelect.addEventListener("change", function() {
+    if (priceSearch.value.trim().length >= 2) {
+      performSearch();
+    } else {
+      searchCount.textContent = "Раздел выбран. Теперь начните вводить название детали, бренд, артикул или модель.";
+    }
+  });
+
+  document.addEventListener("click", function(event) {
+    if (!event.target.closest(".search-wrap")) {
+      suggestions.style.display = "none";
+    }
+  });
+
+  function cleanValue(value) {
+    return value && value.trim() ? value.trim() : "-";
+  }
+
   function buildPlainText(data) {
+    const selectedCategory = categorySelect.value || "-";
+
     return (
       "Здравствуйте. Оставил заявку на подбор автозапчасти.\n\n" +
-      "Тип клиента: " + (data.clientType || "-") + "\n" +
-      "Имя: " + (data.name || "-") + "\n" +
-      "Телефон: " + (data.phone || "-") + "\n" +
-      "Город: " + (data.city || "-") + "\n\n" +
-      "Авто: " + (data.carBrand || "-") + " " + (data.carModel || "-") + "\n" +
-      "Год: " + (data.year || "-") + "\n" +
-      "Двигатель: " + (data.engine || "-") + "\n" +
-      "VIN: " + (data.vin || "-") + "\n\n" +
-      "Деталь: " + (data.part || "-") + "\n" +
-      "Артикул: " + (data.article || "-") + "\n" +
-      "Количество: " + (data.quantity || "-") + "\n" +
-      "Что важнее: " + (data.quality || "-") + "\n" +
-      "Срочность: " + (data.urgency || "-") + "\n\n" +
-      "Комментарий: " + (data.comment || "-") + "\n\n" +
-      "Сейчас отправлю фото детали / VIN / СТС."
+      "Имя: " + cleanValue(data.name) + "\n" +
+      "Телефон: " + cleanValue(data.phone) + "\n\n" +
+      "VIN: " + cleanValue(data.vin) + "\n" +
+      "Раздел: " + cleanValue(selectedCategory) + "\n" +
+      "Авто: " + cleanValue(data.car) + "\n" +
+      "Деталь: " + cleanValue(data.part) + "\n" +
+      "Артикул: " + cleanValue(data.article) + "\n" +
+      "Бренд: " + cleanValue(data.brand) + "\n" +
+      "Что важнее: " + cleanValue(data.quality) + "\n" +
+      "Срочность: " + cleanValue(data.urgency) + "\n\n" +
+      "Комментарий: " + cleanValue(data.comment) + "\n\n" +
+      "Фото детали / VIN / СТС могу отправить дополнительно."
     );
   }
 
@@ -308,12 +603,6 @@
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-
-    if (!data.clientType) {
-      errorMsg.textContent = "Выберите, кто вы: СТО, магазин, частное лицо или автопарк.";
-      errorMsg.style.display = "block";
-      return;
-    }
 
     lastRequestText = buildPlainText(data);
     whatsappLink.href = "https://wa.me/" + WHATSAPP_PHONE + "?text=" + encodeURIComponent(lastRequestText);
@@ -335,5 +624,6 @@
     }
   });
 </script>
+
 </body>
 </html>
