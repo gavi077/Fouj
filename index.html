@@ -135,7 +135,13 @@
 
     button:active { transform: scale(0.99); }
 
-    .note, .field-hint, .search-count {
+    .secondary-btn {
+      background: #efe7d6;
+      color: #2f2a20;
+      margin-top: 10px;
+    }
+
+    .note, .field-hint, .catalog-hint {
       font-size: 13px;
       color: #5f6b76;
       margin-top: 8px;
@@ -143,6 +149,20 @@
     }
 
     .field-hint { font-size: 12px; color: #6b7280; margin-top: 5px; }
+
+    .selected-part {
+      display: none;
+      margin-top: 12px;
+      padding: 13px;
+      border-radius: 15px;
+      background: #e9f7ef;
+      color: #1b6b3a;
+      font-size: 13px;
+      line-height: 1.45;
+      border: 1px solid #cdebd8;
+    }
+
+    .selected-part strong { display: block; font-size: 14px; margin-bottom: 4px; }
 
     .success, .error {
       display: none;
@@ -184,51 +204,105 @@
       cursor: pointer;
     }
 
-    .search-wrap { position: relative; }
-
-    .suggestions {
+    .modal {
       display: none;
-      position: relative;
-      margin-top: 8px;
-      border: 1px solid #e5e1d8;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.58);
+      z-index: 999;
+      padding: 12px;
     }
 
-    .suggestion-item {
-      padding: 12px;
+    .modal.open {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-panel {
+      width: 100%;
+      max-width: 820px;
+      max-height: 92vh;
+      background: white;
+      border-radius: 24px 24px 0 0;
+      overflow: hidden;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-head {
+      padding: 16px;
       border-bottom: 1px solid #eee9df;
+      background: #fff;
+    }
+
+    .modal-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 900;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .close-btn {
+      width: auto;
+      margin: 0;
+      padding: 10px 13px;
+      border-radius: 12px;
+      background: #f3f4f6;
+      color: #111827;
+      font-size: 14px;
+    }
+
+    .modal-body {
+      overflow: auto;
+      padding: 12px 16px 18px;
+    }
+
+    .result-card {
+      border: 1px solid #e5e1d8;
+      border-radius: 16px;
+      padding: 13px;
+      margin-bottom: 10px;
+      background: #fff;
       cursor: pointer;
     }
 
-    .suggestion-item:last-child { border-bottom: none; }
-    .suggestion-item:hover { background: #f7f7f4; }
+    .result-card:hover { background: #f7f7f4; }
 
-    .suggest-title {
+    .result-desc {
       font-weight: 900;
       font-size: 14px;
-      color: #1f2933;
       line-height: 1.35;
     }
 
-    .suggest-meta {
-      margin-top: 4px;
+    .result-meta {
+      margin-top: 6px;
       font-size: 12px;
       color: #6b7280;
-      line-height: 1.35;
+      line-height: 1.45;
     }
 
-    .suggest-cat {
+    .price {
       display: inline-block;
-      margin-top: 6px;
-      padding: 4px 8px;
+      margin-top: 8px;
+      padding: 6px 9px;
       border-radius: 999px;
-      background: #efe7d6;
-      color: #4a3b22;
-      font-size: 11px;
-      font-weight: 800;
+      background: #1f2933;
+      color: white;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .empty-results {
+      padding: 14px;
+      border-radius: 16px;
+      background: #f7f7f4;
+      color: #5f6b76;
+      line-height: 1.45;
     }
 
     footer { text-align: center; padding: 24px 16px; font-size: 13px; color: #6b7280; }
@@ -237,6 +311,8 @@
       .features { grid-template-columns: repeat(3, 1fr); }
       .quick-grid { grid-template-columns: repeat(3, 1fr); }
       h1 { font-size: 34px; }
+      .modal.open { align-items: center; }
+      .modal-panel { border-radius: 24px; }
     }
   </style>
 </head>
@@ -260,7 +336,7 @@
 
     <div class="features">
       <div class="feature">Минимум обязательных полей</div>
-      <div class="feature">Прайс разделён по категориям</div>
+      <div class="feature">Каталог с ценами в отдельном окне</div>
       <div class="feature">Совет по бренду и установке</div>
     </div>
   </section>
@@ -287,14 +363,16 @@
 
       <label>Раздел запчастей <span class="optional">необязательно</span></label>
       <select id="categorySelect"></select>
-      <div class="field-hint">Выберите раздел, чтобы сузить поиск и быстрее найти нужную позицию.</div>
 
-      <label>Поиск по прайсу <span class="optional">необязательно</span></label>
-      <div class="search-wrap">
-        <input id="priceSearch" placeholder="Введите бренд, артикул, название детали или модель авто" autocomplete="off" />
-        <div id="suggestions" class="suggestions"></div>
+      <label>Быстрый поиск в каталоге <span class="optional">необязательно</span></label>
+      <input id="catalogSearch" placeholder="Например: колодки, радиатор, 1855397, Volvo..." />
+
+      <button type="button" id="openCatalogBtn" class="secondary-btn">Открыть каталог по выбранному разделу</button>
+      <div class="catalog-hint" id="catalogHint">
+        Выберите раздел и нажмите кнопку. Откроется окно со списком позиций и ценами.
       </div>
-      <div class="search-count" id="searchCount">В поиск добавлены только раздел, бренд, артикул и описание детали. Остатки и наличие не показываются.</div>
+
+      <div id="selectedPart" class="selected-part"></div>
 
       <label>Авто <span class="optional">необязательно</span></label>
       <input name="car" id="carField" placeholder="Например: Haval Jolion 2022, 1.5 turbo" />
@@ -307,6 +385,8 @@
 
       <label>Бренд детали <span class="optional">необязательно</span></label>
       <input name="brand" id="brandField" placeholder="Например: FORD, MASUMA, PARTBERRY" />
+
+      <input type="hidden" name="price" id="priceField" />
 
       <label>Что важнее? <span class="optional">необязательно</span></label>
       <input type="hidden" name="quality" id="quality" value="Оптимально цена/качество">
@@ -346,22 +426,27 @@
   </section>
 
   <section class="card">
-    <h2>Как работает поиск</h2>
+    <h2>Как работает каталог</h2>
     <p>
-      Сначала выберите раздел: фильтры, тормоза, подвеска, охлаждение и так далее.
-      Потом начните вводить название детали, бренд, артикул или модель из описания.
-      Выберите подходящую строку — название детали, артикул и бренд автоматически попадут в заявку.
+      Выберите раздел, введите уточнение и откройте каталог. В отдельном окне появятся подходящие позиции:
+      бренд, артикул, описание и цена. Нажмите на нужную строку — она автоматически попадёт в заявку.
     </p>
   </section>
 
-  <section class="card">
-    <h2>Экспертная рекомендация</h2>
-    <p>
-      По возможности подскажем краткую информацию о бренде, уровень качества,
-      совет механика и что желательно проверить перед установкой.
-    </p>
-  </section>
+</div>
 
+<div class="modal" id="catalogModal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <div class="modal-title">
+        <span id="modalTitle">Каталог запчастей</span>
+        <button type="button" class="close-btn" id="closeModalBtn">Закрыть</button>
+      </div>
+      <input id="modalSearch" placeholder="Уточнить внутри раздела: бренд, артикул, деталь, модель..." />
+      <div class="catalog-hint" id="modalHint"></div>
+    </div>
+    <div class="modal-body" id="catalogResults"></div>
+  </div>
 </div>
 
 <footer>PartHub 07 — подбор автозапчастей по VIN, авто и описанию детали.</footer>
@@ -378,13 +463,23 @@
   const copyBtn = document.getElementById("copyBtn");
 
   const categorySelect = document.getElementById("categorySelect");
-  const priceSearch = document.getElementById("priceSearch");
-  const suggestions = document.getElementById("suggestions");
-  const searchCount = document.getElementById("searchCount");
+  const catalogSearch = document.getElementById("catalogSearch");
+  const openCatalogBtn = document.getElementById("openCatalogBtn");
+  const catalogHint = document.getElementById("catalogHint");
+  const selectedPart = document.getElementById("selectedPart");
+
+  const catalogModal = document.getElementById("catalogModal");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalSearch = document.getElementById("modalSearch");
+  const modalHint = document.getElementById("modalHint");
+  const catalogResults = document.getElementById("catalogResults");
+
   const carField = document.getElementById("carField");
   const partField = document.getElementById("partField");
   const articleField = document.getElementById("articleField");
   const brandField = document.getElementById("brandField");
+  const priceField = document.getElementById("priceField");
 
   let lastRequestText = "";
   let catalogReady = false;
@@ -423,7 +518,7 @@
   function prepareCatalog() {
     if (catalogReady) return;
     PRICE_CATALOG.forEach(function(item) {
-      item.push((item[0] + " " + item[1] + " " + item[2] + " " + item[3]).toLowerCase());
+      item.push((item[0] + " " + item[1] + " " + item[2] + " " + item[3] + " " + item[4]).toLowerCase());
     });
     catalogReady = true;
   }
@@ -432,61 +527,119 @@
     return (value || "").trim().toLowerCase();
   }
 
-  function renderSuggestions(results, query) {
-    suggestions.innerHTML = "";
+  function searchCatalog(category, query, limit) {
+    prepareCatalog();
 
-    if (!query || query.length < 2) {
-      suggestions.style.display = "none";
-      searchCount.textContent = "Введите минимум 2 символа. Для точности сначала выберите раздел.";
-      return;
+    const q = normalizeQuery(query);
+    const qParts = q.split(/\s+/).filter(Boolean);
+    const results = [];
+
+    for (let i = 0; i < PRICE_CATALOG.length; i++) {
+      const item = PRICE_CATALOG[i];
+
+      if (category && category !== "Все разделы" && item[0] !== category) {
+        continue;
+      }
+
+      if (qParts.length) {
+        const text = item[5];
+        let ok = true;
+
+        for (let j = 0; j < qParts.length; j++) {
+          if (!text.includes(qParts[j])) {
+            ok = false;
+            break;
+          }
+        }
+
+        if (!ok) continue;
+      }
+
+      results.push(item);
+      if (results.length >= limit) break;
     }
+
+    return results;
+  }
+
+  function openCatalog() {
+    const category = categorySelect.value || "Все разделы";
+    const query = catalogSearch.value || "";
+
+    modalTitle.textContent = category === "Все разделы" ? "Каталог: все разделы" : "Каталог: " + category;
+    modalSearch.value = query;
+
+    catalogModal.classList.add("open");
+    document.body.style.overflow = "hidden";
+
+    renderCatalogResults();
+    setTimeout(function() {
+      modalSearch.focus();
+    }, 100);
+  }
+
+  function closeCatalog() {
+    catalogModal.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function renderCatalogResults() {
+    const category = categorySelect.value || "Все разделы";
+    const query = modalSearch.value || "";
+    const results = searchCatalog(category, query, 50);
+
+    catalogResults.innerHTML = "";
 
     if (!results.length) {
-      suggestions.style.display = "none";
-      searchCount.textContent = "Совпадений не найдено. Можно заполнить заявку вручную.";
+      catalogResults.innerHTML = '<div class="empty-results">Ничего не найдено. Попробуйте другой раздел или более короткий запрос.</div>';
+      modalHint.textContent = "Совпадений нет.";
       return;
     }
+
+    modalHint.textContent = "Показано " + results.length + " позиций. Уточните поиск, если список слишком широкий.";
 
     results.forEach(function(item) {
       const div = document.createElement("div");
-      div.className = "suggestion-item";
+      div.className = "result-card";
 
-      const title = document.createElement("div");
-      title.className = "suggest-title";
-      title.textContent = item[3] || "Без описания";
-
-      const meta = document.createElement("div");
-      meta.className = "suggest-meta";
-      meta.textContent = "Бренд: " + (item[1] || "-") + " · Артикул: " + (item[2] || "-");
-
-      const cat = document.createElement("div");
-      cat.className = "suggest-cat";
-      cat.textContent = item[0] || "Прочее";
-
-      div.appendChild(title);
-      div.appendChild(meta);
-      div.appendChild(cat);
+      div.innerHTML =
+        '<div class="result-desc">' + escapeHtml(item[3] || "Без описания") + '</div>' +
+        '<div class="result-meta">Раздел: ' + escapeHtml(item[0] || "-") +
+        '<br>Бренд: ' + escapeHtml(item[1] || "-") +
+        '<br>Артикул: ' + escapeHtml(item[2] || "-") + '</div>' +
+        '<span class="price">Цена: ' + escapeHtml(formatPrice(item[4])) + ' ₽</span>';
 
       div.addEventListener("click", function() {
-        partField.value = item[3] || "";
-        articleField.value = item[2] || "";
-        brandField.value = item[1] || "";
-
-        if (!carField.value.trim()) {
-          const guessedCar = guessCarFromDescription(item[3] || "");
-          if (guessedCar) carField.value = guessedCar;
-        }
-
-        priceSearch.value = (item[2] ? item[2] + " — " : "") + (item[3] || "");
-        suggestions.style.display = "none";
-        searchCount.textContent = "Позиция добавлена в заявку. При необходимости уточните VIN или авто.";
+        chooseCatalogItem(item);
       });
 
-      suggestions.appendChild(div);
+      catalogResults.appendChild(div);
     });
+  }
 
-    suggestions.style.display = "block";
-    searchCount.textContent = "Показаны первые " + results.length + " совпадений. Уточните раздел или запрос, если нужно точнее.";
+  function chooseCatalogItem(item) {
+    partField.value = item[3] || "";
+    brandField.value = item[1] || "";
+    articleField.value = item[2] || "";
+    priceField.value = item[4] || "";
+
+    if (!carField.value.trim()) {
+      const guessedCar = guessCarFromDescription(item[3] || "");
+      if (guessedCar) carField.value = guessedCar;
+    }
+
+    selectedPart.innerHTML =
+      '<strong>Выбрана позиция из каталога</strong>' +
+      'Раздел: ' + escapeHtml(item[0] || "-") +
+      '<br>Бренд: ' + escapeHtml(item[1] || "-") +
+      '<br>Артикул: ' + escapeHtml(item[2] || "-") +
+      '<br>Цена: ' + escapeHtml(formatPrice(item[4])) + ' ₽' +
+      '<br>Деталь: ' + escapeHtml(item[3] || "-");
+
+    selectedPart.style.display = "block";
+    catalogHint.textContent = "Позиция добавлена в заявку. Можно отправлять или дополнить VIN/авто.";
+    closeCatalog();
+    selectedPart.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function guessCarFromDescription(description) {
@@ -509,64 +662,39 @@
     return "";
   }
 
-  function performSearch() {
-    prepareCatalog();
-
-    const query = normalizeQuery(priceSearch.value);
-    const selectedCategory = categorySelect.value;
-
-    if (query.length < 2) {
-      renderSuggestions([], query);
-      return;
-    }
-
-    const qParts = query.split(/\s+/).filter(Boolean);
-    const results = [];
-
-    for (let i = 0; i < PRICE_CATALOG.length; i++) {
-      const item = PRICE_CATALOG[i];
-
-      if (selectedCategory && selectedCategory !== "Все разделы" && item[0] !== selectedCategory) {
-        continue;
-      }
-
-      const searchText = item[4];
-      let ok = true;
-
-      for (let j = 0; j < qParts.length; j++) {
-        if (!searchText.includes(qParts[j])) {
-          ok = false;
-          break;
-        }
-      }
-
-      if (ok) {
-        results.push(item);
-        if (results.length >= 12) break;
-      }
-    }
-
-    renderSuggestions(results, query);
+  function formatPrice(value) {
+    if (!value || value === "-") return "уточнить";
+    return String(value).replace(".", ",");
   }
 
-  let searchTimer = null;
+  function escapeHtml(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-  priceSearch.addEventListener("input", function() {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(performSearch, 160);
+  let modalTimer = null;
+
+  modalSearch.addEventListener("input", function() {
+    clearTimeout(modalTimer);
+    modalTimer = setTimeout(renderCatalogResults, 140);
   });
 
-  categorySelect.addEventListener("change", function() {
-    if (priceSearch.value.trim().length >= 2) {
-      performSearch();
-    } else {
-      searchCount.textContent = "Раздел выбран. Теперь начните вводить название детали, бренд, артикул или модель.";
+  openCatalogBtn.addEventListener("click", openCatalog);
+  closeModalBtn.addEventListener("click", closeCatalog);
+
+  catalogModal.addEventListener("click", function(event) {
+    if (event.target === catalogModal) {
+      closeCatalog();
     }
   });
 
-  document.addEventListener("click", function(event) {
-    if (!event.target.closest(".search-wrap")) {
-      suggestions.style.display = "none";
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+      closeCatalog();
     }
   });
 
@@ -587,6 +715,7 @@
       "Деталь: " + cleanValue(data.part) + "\n" +
       "Артикул: " + cleanValue(data.article) + "\n" +
       "Бренд: " + cleanValue(data.brand) + "\n" +
+      "Цена из каталога: " + cleanValue(data.price ? formatPrice(data.price) + " ₽" : "") + "\n" +
       "Что важнее: " + cleanValue(data.quality) + "\n" +
       "Срочность: " + cleanValue(data.urgency) + "\n\n" +
       "Комментарий: " + cleanValue(data.comment) + "\n\n" +
